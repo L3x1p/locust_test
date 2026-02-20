@@ -1,0 +1,35 @@
+# Env and secrets
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+*.egg-info/
+.eggs/
+
+# Tests and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Locust reports (regenerate with: locust ... --html=report.html --csv=report)
+report.html
+report_*.csv
+report_bottleneck.html
+load_test_report.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

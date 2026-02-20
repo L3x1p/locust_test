@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres-chat
+    environment:
+      POSTGRES_DB: chat
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Qqwerty1!}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d chat"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: vllm-qwen
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${USERPROFILE}/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN:-}
+    # GPU (NVIDIA). Если нет NVIDIA — этот блок надо убрать и vLLM может не заработать.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    command:
+      - --model
+      - Qwen/Qwen2.5-3B-Instruct
+      - --dtype
+      - float16
+      - --max-model-len
+      - "4096"
+      - --gpu-memory-utilization
+      - "0.88"
+      - --api-key
+      - local-token
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
